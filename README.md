@@ -1,3 +1,7 @@
+# Important
+To test with mock db run the following command  
+ `json-server --watch db/1aauto-performance-test/db.json --port 3004`
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
