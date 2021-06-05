@@ -7,17 +7,17 @@ import Col from 'react-bootstrap/Col';
 import Header from './components/Header';
 
 function App() {
-  return (
+  return (<>
+    <Header />
     <Container>
-      <Header/>
       <Row>
         <Col>
-          <Dashboard/>
+          <Dashboard />
         </Col>
       </Row>
     </Container>
     
-  );
+  </>);
 }
 
 export default App;
