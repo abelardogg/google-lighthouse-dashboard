@@ -1,8 +1,8 @@
 import React from 'react';
 import Chart from "react-google-charts";
 
-export default function FMP(props){
-    let arr = [['date', 'FMP']];
+export default function TimeScoreChart(props){
+    let arr = [['date', props.label]];
     arr = arr.concat(props.list)
     // debugger
     return <>
@@ -14,16 +14,16 @@ export default function FMP(props){
                     loader={<div>Loading Chart</div>}
                     data={arr}
                     options={{
-                        title: 'First Meaningful Paint',
+                        title: props.title,
                         chartArea: { width: '80%' },
                         hAxis: {
-                            title: 'Lighthouse metrics',
+                            title: 'Date',
                             minValue: 0,
                         },
                         vAxis: {
                             title: 'Time (in seconds)',
                         },
-                        colors: ['#00aaaa']
+                        colors: props.color
                     }}
                     legendToggle
                 />
