@@ -1,5 +1,11 @@
 import React from 'react';
-import Chart from "react-google-charts";
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import FCP from './charts/FCP';
+import LCP from './charts/LCP';
+import FMP from './charts/FMP';
+
+
 
 
 class Dashboard extends React.Component {
@@ -7,7 +13,11 @@ class Dashboard extends React.Component {
         super(props);
         this.state = {
             requestUrl: null,
-            data: []
+            data: {
+                FCP: [],
+                LCP: [],
+                FMP: [],
+            }
         };
     }
 
@@ -17,21 +27,17 @@ class Dashboard extends React.Component {
             .then(result => {
                 console.info(`Results size: ${result.length}`)
                 const dateList = this.getDate(result);
-                const fcpList = this.getFcp(result);
-                const lcpList = this.getLCP(result);
-                const fmpList = this.getFMP(result);
+                const fcpList = this.getFcp(result, dateList);
+                const lcpList = this.getLCP(result, dateList);
+                const fmpList = this.getFMP(result, dateList);
 
-                let dataList = [];
-                for (let i = 0; i < result.length; i++) {
-                    const dataByDate = [
-                        dateList[i], 
-                        fcpList[i],
-                        lcpList[i],
-                        fmpList[i]
-                    ];
-                    dataList.push(dataByDate);
+                let data = {
+                    FCP: fcpList,
+                    LCP: lcpList,
+                    FMP: fmpList,
                 }
-                this.setState({ data: dataList })
+                
+                this.setState({ data: data })
             });
     }
 
@@ -45,31 +51,58 @@ class Dashboard extends React.Component {
         return list;
     }
 
-    getFcp = results => {
-        let list = [];
+    getFcp = (results, dateList) => {
+        let list = [], dataList = [];
         for (let i = 0; i < results.length; i++) {
             let result = results[i].audits["first-contentful-paint"];
             list.push(Number(result.displayValue.replace('s', '')))
         }
-        return list;
+
+        for (let i = 0; i < list.length; i++) {
+            const dataByDate = [
+                dateList[i], 
+                list[i]
+            ];
+            dataList.push(dataByDate);
+        }
+
+        return dataList;
     }
 
-    getLCP = results => {
-        let list = [];
+    getLCP = (results, dateList) => {
+        let list = [], dataList = [];
         for (let i = 0; i < results.length; i++) {
             let result = results[i].audits["largest-contentful-paint"];
             list.push(Number(result.displayValue.replace('s', '')))
         }
-        return list;
+
+        for (let i = 0; i < list.length; i++) {
+            const dataByDate = [
+                dateList[i], 
+                list[i]
+            ];
+            
+            dataList.push(dataByDate);
+        }
+        
+        return dataList;
     }
 
-    getFMP = results => {
-        let list = [];
+    getFMP = (results, dateList) => {
+        let list = [], dataList = [];
         for (let i = 0; i < results.length; i++) {
             let result = results[i].audits["first-meaningful-paint"];
             list.push(Number(result.displayValue.replace('s', '')))
         }
-        return list;
+
+        for (let i = 0; i < list.length; i++) {
+            const dataByDate = [
+                dateList[i], 
+                list[i]
+            ];
+            dataList.push(dataByDate);
+        }
+        return dataList;
     }
 
     componentDidMount() {
@@ -78,37 +111,28 @@ class Dashboard extends React.Component {
     }
 
     render() {
-        if (this.state.data.length == 0) {
+        if (this.state.data.FCP.length === 0) {
             return null;
         }
-        let arr = [
-            ['m', 'FCP', 'LCP', 'FMP'],
-        ]
+      
 
-        arr = arr.concat(this.state.data)
+        
         return <>
-
-            <div style={{ display: 'flex', maxWidth: '100%' }}>
-                <Chart
-                    width={400}
-                    height={300}
-                    chartType="ColumnChart"
-                    loader={<div>Loading Chart</div>}
-                    data={arr}
-                    options={{
-                        title: this.state.requestUrl,
-                        chartArea: { width: '30%' },
-                        hAxis: {
-                            title: 'Lighthouse metrics',
-                            minValue: 0,
-                        },
-                        vAxis: {
-                            title: 'Time (in seconds)',
-                        },
-                    }}
-                    legendToggle
-                />
-            </div>
+        <Row>
+            <Col>
+                <FCP list={this.state.data.FCP}/>
+            </Col>
+        </Row>
+        <Row>
+            <Col>
+                <LCP list={this.state.data.LCP}/>
+            </Col>
+        </Row>
+        <Row>
+            <Col>
+                <FMP list={this.state.data.FMP}/>
+            </Col>
+        </Row>
         </>
     }
 }
