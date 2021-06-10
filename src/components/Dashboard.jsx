@@ -1,6 +1,9 @@
 import React from 'react';
+import { connect } from 'react-redux';
+
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import { updateChart } from '../redux/actions/charts';
 
 import ScoreChart from './charts/ScoreChart';
 
@@ -8,25 +11,7 @@ import ScoreChart from './charts/ScoreChart';
 class Dashboard extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {
-            requestUrl: null,
-            data: {
-                FCP: [],
-                LCP: [],
-                FMP: [],
-                inputLatency: [],
-                blockingTime: [],
-                maxFID: [],
-                CLS: [],
-                serverResponseTime: [],
-                interactive: [],
-                firstCpuIdle: [],
-                mainThreadWork: [],
-                bootupTime: [],
-                networkRTT: [],
-                speedIndex: []
-            }
-        };
+        this.state = {};
     }
 
     requestData = () => {
@@ -54,8 +39,10 @@ class Dashboard extends React.Component {
                     
 
                 }
-                
-                this.setState({ data: data })
+                this.props.updateChart(data)
+            }).catch(err=>{
+                console.log(err);
+                // this.setState({noDataAvaialble: true})
             });
     }
 
@@ -105,8 +92,11 @@ class Dashboard extends React.Component {
     }
 
     render() {
-        if (this.state.data.FCP.length === 0) {
-            return null;
+debugger
+        if (this.props.charts.noDataAvaialble === true) {
+            return <h1>
+                looks like there are no data to track
+            </h1>
         }
       
         
@@ -118,73 +108,73 @@ class Dashboard extends React.Component {
         </Row>
         <Row>
             <Col>
-                <ScoreChart list={this.state.data.FCP} title='First Contentful Paint' label='Load time' color={['#0066cc']} vTitle='Time (in seconds)' description="First Contentful Paint marks the time at which the first text or image is painted. [Learn more](https://web.dev/first-contentful-paint/)."/>
+                <ScoreChart list={this.props.charts.data.FCP} title='First Contentful Paint' label='Load time' color={['#0066cc']} vTitle='Time (in seconds)' description="First Contentful Paint marks the time at which the first text or image is painted. [Learn more](https://web.dev/first-contentful-paint/)."/>
             </Col>
         </Row>
         <Row>
             <Col>
-                <ScoreChart list={this.state.data.LCP} title='Largest Contentful Paint' label='Load time' color={['#f6a6cc']}  vTitle='Time (in seconds)' description="Largest Contentful Paint marks the time at which the largest text or image is painted. [Learn more](https://web.dev/lighthouse-largest-contentful-paint/)"/>
+                <ScoreChart list={this.props.charts.data.LCP} title='Largest Contentful Paint' label='Load time' color={['#f6a6cc']}  vTitle='Time (in seconds)' description="Largest Contentful Paint marks the time at which the largest text or image is painted. [Learn more](https://web.dev/lighthouse-largest-contentful-paint/)"/>
             </Col>
         </Row>
         <Row>
             <Col>
-                <ScoreChart list={this.state.data.FMP} title='First Meaningful Paint' label='Load time' color={['#caf80f']}  vTitle='Time (in seconds)' description="First Meaningful Paint measures when the primary content of a page is visible. [Learn more](https://web.dev/first-meaningful-paint/)."/>
+                <ScoreChart list={this.props.charts.data.FMP} title='First Meaningful Paint' label='Load time' color={['#caf80f']}  vTitle='Time (in seconds)' description="First Meaningful Paint measures when the primary content of a page is visible. [Learn more](https://web.dev/first-meaningful-paint/)."/>
             </Col>
         </Row>
         <Row>
             <Col>
-                <ScoreChart list={this.state.data.speedIndex} title='Speed Index' label='Load time' color={['#af0f22']}  vTitle='Time (in seconds)' description="Speed Index shows how quickly the contents of a page are visibly populated. [Learn more](https://web.dev/speed-index/)."/>
+                <ScoreChart list={this.props.charts.data.speedIndex} title='Speed Index' label='Load time' color={['#af0f22']}  vTitle='Time (in seconds)' description="Speed Index shows how quickly the contents of a page are visibly populated. [Learn more](https://web.dev/speed-index/)."/>
             </Col>
         </Row>
         <Row>
             <Col>
-                <ScoreChart list={this.state.data.inputLatency} title='Estimated Input Latency' label='Load time' color={['#fac190']}  vTitle='Time (in seconds)' description="Estimated Input Latency is an estimate of how long your app takes to respond to user input, in milliseconds, during the busiest 5s window of page load. If your latency is higher than 50 ms, users may perceive your app as laggy. [Learn more](https://web.dev/estimated-input-latency/)."/>
+                <ScoreChart list={this.props.charts.data.inputLatency} title='Estimated Input Latency' label='Load time' color={['#fac190']}  vTitle='Time (in seconds)' description="Estimated Input Latency is an estimate of how long your app takes to respond to user input, in milliseconds, during the busiest 5s window of page load. If your latency is higher than 50 ms, users may perceive your app as laggy. [Learn more](https://web.dev/estimated-input-latency/)."/>
             </Col>
         </Row>
         <Row>
             <Col>
-                <ScoreChart list={this.state.data.blockingTime} title='Total Blocking Time' label='Load time' color={['#00fa21']}  vTitle='Time (in seconds)' description="Sum of all time periods between FCP and Time to Interactive, when task length exceeded 50ms, expressed in milliseconds. [Learn more](https://web.dev/lighthouse-total-blocking-time/)."/>
+                <ScoreChart list={this.props.charts.data.blockingTime} title='Total Blocking Time' label='Load time' color={['#00fa21']}  vTitle='Time (in seconds)' description="Sum of all time periods between FCP and Time to Interactive, when task length exceeded 50ms, expressed in milliseconds. [Learn more](https://web.dev/lighthouse-total-blocking-time/)."/>
             </Col>
         </Row>
         <Row>
             <Col>
-                <ScoreChart list={this.state.data.maxFID} title='Max Potential First Input Delay' label='Load time' color={['#f00ff0']}  vTitle='Time (in seconds)' description="The maximum potential First Input Delay that your users could experience is the duration of the longest task. [Learn more](https://web.dev/lighthouse-max-potential-fid/)."/>
-            </Col>
-        </Row>
-
-        <Row>
-            <Col>
-                <ScoreChart list={this.state.data.serverResponseTime} title='Reduce initial server response time' label='Load time' color={['#9f7a5b']}  vTitle='Time (in seconds)' description="Keep the server response time for the main document short because all other requests depend on it. [Learn more](https://web.dev/time-to-first-byte/)."/>
+                <ScoreChart list={this.props.charts.data.maxFID} title='Max Potential First Input Delay' label='Load time' color={['#f00ff0']}  vTitle='Time (in seconds)' description="The maximum potential First Input Delay that your users could experience is the duration of the longest task. [Learn more](https://web.dev/lighthouse-max-potential-fid/)."/>
             </Col>
         </Row>
 
         <Row>
             <Col>
-                <ScoreChart list={this.state.data.interactive} title='Time to Interactive' label='Load time' color={['#1f7c5b']}  vTitle='Time (in seconds)' description="Time to interactive is the amount of time it takes for the page to become fully interactive. [Learn more](https://web.dev/interactive/)."/>
+                <ScoreChart list={this.props.charts.data.serverResponseTime} title='Reduce initial server response time' label='Load time' color={['#9f7a5b']}  vTitle='Time (in seconds)' description="Keep the server response time for the main document short because all other requests depend on it. [Learn more](https://web.dev/time-to-first-byte/)."/>
             </Col>
         </Row>
 
         <Row>
             <Col>
-                <ScoreChart list={this.state.data.firstCpuIdle} title='First CPU Idle' label='Load time' color={['#901b50']}  vTitle='Time (in seconds)' description="First CPU Idle marks the first time at which the page's main thread is quiet enough to handle input.  [Learn more](https://web.dev/first-cpu-idle/)."/>
+                <ScoreChart list={this.props.charts.data.interactive} title='Time to Interactive' label='Load time' color={['#1f7c5b']}  vTitle='Time (in seconds)' description="Time to interactive is the amount of time it takes for the page to become fully interactive. [Learn more](https://web.dev/interactive/)."/>
             </Col>
         </Row>
 
         <Row>
             <Col>
-                <ScoreChart list={this.state.data.mainThreadWork} title='Minimize main-thread work' label='Load time' color={['#00bbbb']}  vTitle='Time (in seconds)' description="Consider reducing the time spent parsing, compiling and executing JS. You may find delivering smaller JS payloads helps with this. [Learn more](https://web.dev/mainthread-work-breakdown/)"/>
+                <ScoreChart list={this.props.charts.data.firstCpuIdle} title='First CPU Idle' label='Load time' color={['#901b50']}  vTitle='Time (in seconds)' description="First CPU Idle marks the first time at which the page's main thread is quiet enough to handle input.  [Learn more](https://web.dev/first-cpu-idle/)."/>
             </Col>
         </Row>
 
         <Row>
             <Col>
-                <ScoreChart list={this.state.data.bootupTime} title='Reduce JavaScript execution time' label='Load time' color={['#aa00ff']}  vTitle='Time (in seconds)' description="Consider reducing the time spent parsing, compiling, and executing JS. You may find delivering smaller JS payloads helps with this. [Learn more](https://web.dev/bootup-time/)."/>
+                <ScoreChart list={this.props.charts.data.mainThreadWork} title='Minimize main-thread work' label='Load time' color={['#00bbbb']}  vTitle='Time (in seconds)' description="Consider reducing the time spent parsing, compiling and executing JS. You may find delivering smaller JS payloads helps with this. [Learn more](https://web.dev/mainthread-work-breakdown/)"/>
             </Col>
         </Row>
 
         <Row>
             <Col>
-                <ScoreChart list={this.state.data.networkRTT} title='Network Round Trip Times' label='Load time' color={['#000000']}  vTitle='Time (in seconds)' description="Server latencies can impact web performance. If the server latency of an origin is high, it's an indication the server is overloaded or has poor backend performance. [Learn more](https://hpbn.co/primer-on-web-performance/#analyzing-the-resource-waterfall)."/>
+                <ScoreChart list={this.props.charts.data.bootupTime} title='Reduce JavaScript execution time' label='Load time' color={['#aa00ff']}  vTitle='Time (in seconds)' description="Consider reducing the time spent parsing, compiling, and executing JS. You may find delivering smaller JS payloads helps with this. [Learn more](https://web.dev/bootup-time/)."/>
+            </Col>
+        </Row>
+
+        <Row>
+            <Col>
+                <ScoreChart list={this.props.charts.data.networkRTT} title='Network Round Trip Times' label='Load time' color={['#000000']}  vTitle='Time (in seconds)' description="Server latencies can impact web performance. If the server latency of an origin is high, it's an indication the server is overloaded or has poor backend performance. [Learn more](https://hpbn.co/primer-on-web-performance/#analyzing-the-resource-waterfall)."/>
             </Col>
         </Row>
 
@@ -199,7 +189,7 @@ class Dashboard extends React.Component {
 
         <Row>
             <Col>
-                <ScoreChart list={this.state.data.CLS} title='Cumulative Layout Shift' label='CLS points' color={['#69c2af']}  vTitle='Points'  description="Cumulative Layout Shift measures the movement of visible elements within the viewport. [Learn more](https://web.dev/cls/)."/>
+                <ScoreChart list={this.props.charts.data.CLS} title='Cumulative Layout Shift' label='CLS points' color={['#69c2af']}  vTitle='Points'  description="Cumulative Layout Shift measures the movement of visible elements within the viewport. [Learn more](https://web.dev/cls/)."/>
             </Col>
         </Row>
 
@@ -207,6 +197,18 @@ class Dashboard extends React.Component {
     }
 }
 
-export default Dashboard;
+
+
+const mapStateToProps = state => {
+    return {
+        charts: state.charts
+    }
+}
+const mapDispatchToProps = () => {
+    return {
+        updateChart
+    }
+}
+export default connect(mapStateToProps, mapDispatchToProps())(Dashboard)
 
 
