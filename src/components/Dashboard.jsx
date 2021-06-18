@@ -121,6 +121,7 @@ class Dashboard extends React.Component {
         <Row className="mb-3">
             <Col>
                 <h2>Charts with score based in points</h2>
+                <h5>score points x100,000</h5>
             </Col>
         </Row>
 

@@ -38,7 +38,7 @@ class DataReader extends React.Component{
             FMP: this.generateRegisterBasedOnTimeScore(result, dateList, 'first-meaningful-paint'),
             blockingTime: this.generateRegisterBasedOnTimeScore(result, dateList, 'total-blocking-time'),
             maxFID: this.generateRegisterBasedOnTimeScore(result, dateList, 'max-potential-fid'),
-            CLS: this.generateRegisterBasedOnTimeScore(result, dateList, 'cumulative-layout-shift'),
+            CLS: this.generateRegisterBasedOnTimeScore(result, dateList, 'cumulative-layout-shift', 100000),
             serverResponseTime: this.generateRegisterBasedOnTimeScore(result, dateList, 'server-response-time'),
             interactive: this.generateRegisterBasedOnTimeScore(result, dateList, 'interactive'),
             // firstCpuIdle: this.generateRegisterBasedOnTimeScore(result, dateList, 'first-cpu-idle'),
@@ -52,14 +52,17 @@ class DataReader extends React.Component{
 
     }
 
-    generateRegisterBasedOnTimeScore = (results, dateList, auditName) => {
+    generateRegisterBasedOnTimeScore = (results, dateList, auditName, multipler = null) => {
         let list = [], dataList = [];
         for (let i = 0; i < results.length; i++) {
             console.info(`audit name: ${auditName}`)
             let result = results[i].lighthouseAuditsResult[auditName];
+
             let numericUnit = result.numericUnit;
-            
-            if(numericUnit==='millisecond'){
+            if (multipler !== null){
+                debugger
+                list.push(result.numericValue*multipler);
+            } else if(numericUnit==='millisecond'){
                 list.push(result.numericValue/1000);
             } else if(numericUnit==='second' || numericUnit === 'unitless'){
                 list.push(result.numericValue);

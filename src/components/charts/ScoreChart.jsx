@@ -20,7 +20,7 @@ export default function ScoreChart(props){
                     data={arr}
                     options={{
                         //title: props.title,
-                        description: 'wenas',
+                        description: '',
                         chartArea: { width: '80%' },
                         hAxis: {
                             title: 'Date',
