@@ -1,9 +1,12 @@
 import {combineReducers, createStore} from 'redux';
 import charts from './reducers/charts';
+import data from './reducers/data';
+
 
 const initialState = {};
 export const rootReducers = combineReducers({
-    charts
+    charts,
+    data
 });
 
 export function configureStore(initialState = {}){

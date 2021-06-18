@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { updateChart } from '../redux/actions/charts';
+import DataReader from './DataReader'
 
 import ScoreChart from './charts/ScoreChart';
 
@@ -92,11 +93,14 @@ class Dashboard extends React.Component {
     }
 
     render() {
-debugger
+
         if (this.props.charts.noDataAvaialble === true) {
-            return <h1>
+            return <> 
+            <h1>
                 looks like there are no data to track
             </h1>
+            <DataReader/>
+            </>
         }
       
         
