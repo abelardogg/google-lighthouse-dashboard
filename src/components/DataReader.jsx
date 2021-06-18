@@ -12,6 +12,17 @@ class DataReader extends React.Component{
         e.preventDefault()
         const self = this;
         let fileContent = document.getElementById('test-text').files[0];
+
+        const fileName = Number(fileContent.name.replace('.json',''))
+        for(let i = 0; i < this.props.data.dataCollection.length; i++){
+            const current = this.props.data.dataCollection[i]
+            if(current.msDate === fileName){
+                alert('same file')
+                return
+            }
+        }
+    
+
         const fileReader = new FileReader();
         let content = null;
         fileReader.onload = event => {
@@ -60,7 +71,6 @@ class DataReader extends React.Component{
 
             let numericUnit = result.numericUnit;
             if (multipler !== null){
-                debugger
                 list.push(result.numericValue*multipler);
             } else if(numericUnit==='millisecond'){
                 list.push(result.numericValue/1000);
