@@ -12,7 +12,6 @@ export default function (state = initialState, actions){
                 noDataAvaialble: false,
                 data: actions.charts
             };
-            
 
         default:
             return {

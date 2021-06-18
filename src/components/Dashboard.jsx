@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { updateChart } from '../redux/actions/charts';
+
 import DataReader from './DataReader'
 
 import ScoreChart from './charts/ScoreChart';
@@ -15,84 +16,22 @@ class Dashboard extends React.Component {
         this.state = {};
     }
 
-    requestData = () => {
-        fetch('http://localhost:3004/data')
-            .then(res => res.json())
-            .then(result => {
-                console.info(`Results size: ${result.length}`)
-                const dateList = this.getDate(result);
-
-                let data = {
-                    inputLatency: this.generateRegisterBasedOnTimeScore(result, dateList, 'estimated-input-latency'),
-                    FCP: this.generateRegisterBasedOnTimeScore(result, dateList, 'first-contentful-paint'),
-                    LCP: this.generateRegisterBasedOnTimeScore(result, dateList, 'largest-contentful-paint'),
-                    FMP: this.generateRegisterBasedOnTimeScore(result, dateList, 'first-meaningful-paint'),
-                    blockingTime: this.generateRegisterBasedOnTimeScore(result, dateList, 'total-blocking-time'),
-                    maxFID: this.generateRegisterBasedOnTimeScore(result, dateList, 'max-potential-fid'),
-                    CLS: this.generateRegisterBasedOnTimeScore(result, dateList, 'cumulative-layout-shift'),
-                    serverResponseTime: this.generateRegisterBasedOnTimeScore(result, dateList, 'server-response-time'),
-                    interactive: this.generateRegisterBasedOnTimeScore(result, dateList, 'interactive'),
-                    firstCpuIdle: this.generateRegisterBasedOnTimeScore(result, dateList, 'first-cpu-idle'),
-                    mainThreadWork: this.generateRegisterBasedOnTimeScore(result, dateList, 'mainthread-work-breakdown'),
-                    bootupTime: this.generateRegisterBasedOnTimeScore(result, dateList, 'bootup-time'),
-                    networkRTT: this.generateRegisterBasedOnTimeScore(result, dateList, 'network-rtt'),
-                    speedIndex: this.generateRegisterBasedOnTimeScore(result, dateList, 'speed-index'),
-                    
-
-                }
-                this.props.updateChart(data)
-            }).catch(err=>{
-                console.log(err);
-                // this.setState({noDataAvaialble: true})
-            });
-    }
+    
 
     /**
      * 
      */
-    generateRegisterBasedOnTimeScore = (results, dateList, auditName) => {
-        let list = [], dataList = [];
-        for (let i = 0; i < results.length; i++) {
-            let result = results[i].audits[auditName];
-            let numericUnit = result.numericUnit;
-            
-            if(numericUnit==='millisecond'){
-                list.push(result.numericValue/1000);
-            } else if(numericUnit==='second' || numericUnit === 'unitless'){
-                list.push(result.numericValue);
-            } else {
-                console.error(`The following value for ${auditName} can't be formatted: ${result.displayValue}`)
-            }
-        }
-
-        for (let i = 0; i < list.length; i++) {
-            const dataByDate = [
-                dateList[i], 
-                list[i]
-            ];
-            dataList.push(dataByDate);
-        }
-
-        return dataList;
-    };
-
-    getDate = results => {
-        let list = [];
-        for (let i = 0; i < results.length; i++) {
-            let result = results[i]
-
-            list.push(`${new Date(result.fetchTime).toLocaleString().split(' ')[0]}`)
-        }
-        return list;
-    }
+    
 
 
     componentDidMount() {
-        this.requestData()
+        
 
     }
 
     render() {
+
+       
 
         if (this.props.charts.noDataAvaialble === true) {
             return <> 
@@ -105,6 +44,11 @@ class Dashboard extends React.Component {
       
         
         return <>
+        <Row className="mb-3">
+            <Col>
+                <DataReader/>
+            </Col>
+        </Row>
         <Row className="mb-3">
             <Col>
                 <h2>Charts with score based in time</h2>
@@ -130,11 +74,7 @@ class Dashboard extends React.Component {
                 <ScoreChart list={this.props.charts.data.speedIndex} title='Speed Index' label='Load time' color={['#af0f22']}  vTitle='Time (in seconds)' description="Speed Index shows how quickly the contents of a page are visibly populated. [Learn more](https://web.dev/speed-index/)."/>
             </Col>
         </Row>
-        <Row>
-            <Col>
-                <ScoreChart list={this.props.charts.data.inputLatency} title='Estimated Input Latency' label='Load time' color={['#fac190']}  vTitle='Time (in seconds)' description="Estimated Input Latency is an estimate of how long your app takes to respond to user input, in milliseconds, during the busiest 5s window of page load. If your latency is higher than 50 ms, users may perceive your app as laggy. [Learn more](https://web.dev/estimated-input-latency/)."/>
-            </Col>
-        </Row>
+
         <Row>
             <Col>
                 <ScoreChart list={this.props.charts.data.blockingTime} title='Total Blocking Time' label='Load time' color={['#00fa21']}  vTitle='Time (in seconds)' description="Sum of all time periods between FCP and Time to Interactive, when task length exceeded 50ms, expressed in milliseconds. [Learn more](https://web.dev/lighthouse-total-blocking-time/)."/>
@@ -157,13 +97,6 @@ class Dashboard extends React.Component {
                 <ScoreChart list={this.props.charts.data.interactive} title='Time to Interactive' label='Load time' color={['#1f7c5b']}  vTitle='Time (in seconds)' description="Time to interactive is the amount of time it takes for the page to become fully interactive. [Learn more](https://web.dev/interactive/)."/>
             </Col>
         </Row>
-
-        <Row>
-            <Col>
-                <ScoreChart list={this.props.charts.data.firstCpuIdle} title='First CPU Idle' label='Load time' color={['#901b50']}  vTitle='Time (in seconds)' description="First CPU Idle marks the first time at which the page's main thread is quiet enough to handle input.  [Learn more](https://web.dev/first-cpu-idle/)."/>
-            </Col>
-        </Row>
-
         <Row>
             <Col>
                 <ScoreChart list={this.props.charts.data.mainThreadWork} title='Minimize main-thread work' label='Load time' color={['#00bbbb']}  vTitle='Time (in seconds)' description="Consider reducing the time spent parsing, compiling and executing JS. You may find delivering smaller JS payloads helps with this. [Learn more](https://web.dev/mainthread-work-breakdown/)"/>
@@ -205,7 +138,8 @@ class Dashboard extends React.Component {
 
 const mapStateToProps = state => {
     return {
-        charts: state.charts
+        charts: state.charts,
+        data: state.data
     }
 }
 const mapDispatchToProps = () => {
